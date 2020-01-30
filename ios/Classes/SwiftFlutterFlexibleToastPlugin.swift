@@ -31,8 +31,8 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             let radius = arguments["radius"] as? NSNumber ?? NSNumber(value: 0)
             let elevation = arguments["elevation"] as? NSNumber ?? NSNumber(value: 0)
             let cgf = fontSize.doubleValue
-            let backgroundColor = UIColor(rgb: bgcolor.intValue)//hexStringToUIColor(hex: String(format:"%02X", bgcolor.intValue))
-            let textColor = UIColor(rgb: txtColor.intValue)//hexStringToUIColor(hex: String(format:"%02X", txtColor.intValue))
+            let backgroundColor = UIColor(rgb: bgcolor.intValue)
+            let textColor = UIColor(rgb: txtColor.intValue)
             var time = 1;
             time = (durationTime.intValue == 0) ? 3 : durationTime.intValue
             if time > 10 {
@@ -51,16 +51,14 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             }
             if gravity == "top" {
                 let image =  self.getImageFromBundle(name: "backward")
-                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .top, title: "", image: image, style: style) { (finish) in
+                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .top, title: nil, image: image, style: style) { (finish) in
                     
                 }
             } else if gravity == "center" {
-                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .center, title: "\(txtColor.intValue)", image: nil, style: style) { (finish) in
-                    
+                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .center, title: nil, image: nil, style: style) { (finish) in
                 }
             } else {
-                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .bottom, title: "", image: nil, style: style) { (finish) in
-                    
+                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .bottom, title: nil, image: nil, style: style) { (finish) in
                 }
             }
             result(NSNumber(value: true))
@@ -84,28 +82,6 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
     //     return nil
     // }
 
-    func hexStringToUIColor (hex:String) -> UIColor {
-        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        
-        if (cString.hasPrefix("#")) {
-            cString.remove(at: cString.startIndex)
-        }
-        
-        if ((cString.count) != 6) {
-            return UIColor.gray
-        }
-        
-        var rgbValue:UInt64 = 0
-        Scanner(string: cString).scanHexInt64(&rgbValue)
-        
-        return UIColor(
-            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-            alpha: CGFloat(1.0)
-        )
-    }
-    
     public func imageFromFlutter(name: String) -> UIImage? {
         let key = registrar?.lookupKey(forAsset: name)
         guard let topPath = Bundle.main.path(forResource: key, ofType: nil) else {return nil}
