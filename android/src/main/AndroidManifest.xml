@@ -1,3 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="sanketvekariya.flutter_flexible_toast">
+    package="sanketvekariya.flutter_flexible_toast">
+
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

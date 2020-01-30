@@ -3,7 +3,7 @@
 * Added New Loading Gif Support.
 * new : Toast layout radius.
 * new : Toast layout elevation.
-* fix : Nug fixes, Improved stability.
+* fix : Bug fixes, Improved stability.
 
 ## 0.1.1
 
