@@ -19,9 +19,7 @@ enum ICON {
   LOCATION,
   WALLET,
   DND,
-  LOADING,
-  LOADING_SUCCESS,
-  LOADING_FAILURE
+  LOADING
 }
 
 class FlutterFlexibleToast {
