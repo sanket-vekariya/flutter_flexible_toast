@@ -1,14 +1,37 @@
 # flutter_flexible_toast
 
-A Powerful Toast Library for Flutter, Easily create toast messages in single line of code with leading image options.
+Toast Library for Flutter.
 
-## Getting Started
+### How to Use
+just add below in pubspec.yaml 
+```
+flutter_flexible_toast: ^0.1.2
+```
+```
+import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
+```
+```
+FlutterFlexibleToast.showToast(
+    message: "Short Loading 2 Sec Toast",
+    toastLength: Toast.LENGTH_LONG,
+    toastGravity: ToastGravity.BOTTOM,
+    icon: ICON.LOADING,
+    radius: 100,
+    elevation: 10,
+    textColor: Colors.white,
+    backgroundColor: Colors.black,
+    timeInSeconds: 2);
+```
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+### To cancel all the toasts call
+```
+FlutterFlexibleToast.cancel();
+```
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+### Preview Screenshots 
+![short_info_one_second_toast](https://user-images.githubusercontent.com/52414184/66133939-24589e80-e615-11e9-8cbb-20f79f917a1d.png)
+![short_red_success_toast](https://user-images.githubusercontent.com/52414184/66134012-3f2b1300-e615-11e9-89dd-93b19d6de9c0.png)
+![short_loading_gif_toast](https://user-images.githubusercontent.com/52414184/68575338-d8a9d800-0491-11ea-904d-9324b76ac617.gif)
+
+### For More Info 
+Email on ssvekariya11@gmail.com

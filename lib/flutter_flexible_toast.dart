@@ -1,13 +1,112 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+enum Toast { LENGTH_SHORT, LENGTH_LONG }
+
+enum ToastGravity { TOP, BOTTOM, CENTER }
+
+enum ICON {
+  CLOSE,
+  ERROR,
+  INFO,
+  SUCCESS,
+  WARNING,
+  ALARM,
+  LOCATION,
+  WALLET,
+  DND,
+  LOADING,
+  LOADING_SUCCESS,
+  LOADING_FAILURE
+}
 
 class FlutterFlexibleToast {
   static const MethodChannel _channel =
       const MethodChannel('flutter_flexible_toast');
 
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
+  static Future<bool> cancel() async {
+    bool res = await _channel.invokeMethod("cancel");
+    return res;
+  }
+
+  static Future<bool> showToast({
+    @required String message,
+    Toast toastLength,
+    int timeInSeconds,
+    double fontSize,
+    ToastGravity toastGravity,
+    Color backgroundColor,
+    Color textColor,
+    ICON icon,
+    int radius,
+    int elevation,
+  }) async {
+    String toast = "short";
+    if (toastLength == Toast.LENGTH_LONG) {
+      toast = "long";
+    }
+    String gravityToast = "bottom";
+    if (toastGravity == ToastGravity.TOP) {
+      gravityToast = "top";
+    } else if (toastGravity == ToastGravity.CENTER) {
+      gravityToast = "center";
+    } else {
+      gravityToast = "bottom";
+    }
+
+    String images;
+    if (icon == ICON.CLOSE) {
+      images = "close";
+    } else if (icon == ICON.ERROR) {
+      images = "error";
+    } else if (icon == ICON.INFO) {
+      images = "info";
+    } else if (icon == ICON.SUCCESS) {
+      images = "success";
+    } else if (icon == ICON.WARNING) {
+      images = "warning";
+    } else if (icon == ICON.ALARM) {
+      images = "alarm";
+    } else if (icon == ICON.LOCATION) {
+      images = "location";
+    } else if (icon == ICON.WALLET) {
+      images = "wallet";
+    } else if (icon == ICON.DND) {
+      images = "dnd";
+    } else if (icon == ICON.LOADING) {
+      images = "loading";
+    } else {
+      images = null;
+    }
+
+    if (backgroundColor == null) {
+      backgroundColor = Colors.black;
+    }
+    if (textColor == null) {
+      textColor = Colors.white;
+    }
+
+    /**
+     * mapped input here with method channel for native changes.
+     */
+    final Map<String, dynamic> parameters = <String, dynamic>{
+      'message': message,
+      'length': toast,
+      'time': timeInSeconds != null ? timeInSeconds : 1,
+      'gravity': gravityToast,
+      'icon': images,
+      'bgcolor': backgroundColor != null ? backgroundColor.value : null,
+      'textcolor': textColor != null ? textColor.value : null,
+      'fontSize': fontSize != null ? fontSize : 16.0,
+      'radius': radius != null ? radius : 5,
+      'elevation': elevation != null ? elevation : 5,
+    };
+
+    bool res = await _channel.invokeMethod('showToast', parameters);
+    return res;
   }
 }

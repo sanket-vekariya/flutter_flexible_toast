@@ -1,3 +1,16 @@
+## 0.1.2
+
+* Added New Loading Gif Support.
+* new : Toast layout radius.
+* new : Toast layout elevation.
+* fix : Nug fixes, Improved stability.
+
+## 0.1.1
+
+* Added New Alarm, Location, DND, Wallet icons as per some requests.
+* minor Fixes. Improved Stability.
+
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Close, Error, Info, Success, Warning.
+* Custom color with Toast time.

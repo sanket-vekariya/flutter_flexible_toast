@@ -1,16 +1,25 @@
-# flutter_flexible_toast_example
+# flutter_flexible_toast Example
 
-Demonstrates how to use the flutter_flexible_toast plugin.
+```
+flutter_flexible_toast: ^0.1.2
+```
+```
+import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
+```
+```
+FlutterFlexibleToast.showToast(
+    message: "Short Loading 2 Sec Toast",
+    toastLength: Toast.LENGTH_LONG,
+    toastGravity: ToastGravity.BOTTOM,
+    icon: ICON.LOADING,
+    radius: 100,
+    elevation: 10,
+    textColor: Colors.white,
+    backgroundColor: Colors.black,
+    timeInSeconds: 2);
+```
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### To cancel all the toasts call
+```
+FlutterFlexibleToast.cancel();
+```
