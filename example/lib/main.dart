@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
         toastLength: Toast.LENGTH_LONG,
         toastGravity: ToastGravity.BOTTOM,
         icon: ICON.LOADING,
-        radius: 100,
+        radius: 20,
         elevation: 10,
         textColor: Colors.white,
         backgroundColor: Colors.black,
