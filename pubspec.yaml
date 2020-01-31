@@ -27,12 +27,12 @@ flutter:
   plugin:
     androidPackage: sanketvekariya.flutter_flexible_toast
     pluginClass: FlutterFlexibleToastPlugin
-    
 
   # To add assets to your plugin package, add an assets section, like this:
   assets:
-   - images/ic_dnd.png
-  #  - images/a_dot_ham.jpeg
+    - images/
+    
+    # - images/a_dot_ham.jpeg
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages
