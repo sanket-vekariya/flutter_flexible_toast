@@ -1,16 +1,20 @@
 import Flutter
 import UIKit
 import ObjectiveC
+import Foundation
+import ImageIO
+import MobileCoreServices
 
 public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
     var registrar: FlutterPluginRegistrar? = nil
+    //MARK: - Register Flutter Plugin class with channel
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_flexible_toast", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterFlexibleToastPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         instance.registrar = registrar
     }
-    
+    //MARK: - Handle method channel response
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
         if "cancel" == call.method {
@@ -21,7 +25,6 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             self.readKeyWindow()!.hideAllToasts()
             guard let arguments = call.arguments as? [String: Any] else { return result(NSNumber(value: false)) }
             let message = arguments["message"] as? String ?? ""
-            let length = arguments["length"] as? NSNumber ?? NSNumber(value: 0)
             let durationTime = arguments["time"] as? NSNumber ?? NSNumber(value: 0)
             let gravity = arguments["gravity"] as? String ?? ""
             let icon = arguments["icon"] as? String ?? "images/ic_dnd.png"
@@ -29,8 +32,6 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             let txtColor = arguments["textcolor"] as? NSNumber ?? NSNumber(value: 0)
             let fontSize = arguments["fontSize"] as? NSNumber ?? NSNumber(value: 0)
             let radius = arguments["radius"] as? NSNumber ?? NSNumber(value: 0)
-            let elevation = arguments["elevation"] as? NSNumber ?? NSNumber(value: 0)
-            let cgf = fontSize.doubleValue
             let backgroundColor = UIColor(rgb: bgcolor.intValue)
             let textColor = UIColor(rgb: txtColor.intValue)
             var time = 1;
@@ -45,12 +46,7 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             style.messageColor = textColor
             style.cornerRadius = CGFloat(radius.intValue)
             style.imageSize = CGSize(width: 40.0, height: 40.0)
-            if #available(iOS 11.0, *) {
-                let window = UIApplication.shared.keyWindow
-                let topPadding = window?.safeAreaInsets.top
-                let bottomPadding = window?.safeAreaInsets.bottom
-            }
-            var imageName = "packages/flutter_flexible_toast/images/"
+            var imageName = "images/"
             switch icon {
             case "close":
                 imageName.append("ic_close.png")
@@ -74,16 +70,21 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
                 imageName.append("loading.gif")
             default: break
             }
-            let image =  getImage(name: imageName)
+            var image: UIImage?
+            if icon == "loading" {
+                image = getGIF(name: imageName)
+            } else {
+                image = getImage(name: imageName)
+            }
             if let viewToShowOn = self.readKeyWindow() {
                 if gravity == "top" {
-                    viewToShowOn.makeToast("Hello my name is haresh and i am not a tester. Sanket gets it better. fjgnfgn fgnfgnf dgn  dgndkgjndngdnfjkgkdnkgdk gkn kgn kdngkdgidnfgung rg dpgofg dofgjodfjgo dgo fjoij", duration: TimeInterval(time), position: .top, title: nil, image: image, style: style) { (finish) in
+                    viewToShowOn.makeToast(message, duration: TimeInterval(time), position: .top, title: nil, image: image, style: style) { (finish) in
                     }
                 } else if gravity == "center" {
                     viewToShowOn.makeToast(message, duration: TimeInterval(time), position: .center, title: nil, image: image, style: style) { (finish) in
                     }
                 } else {
-                    viewToShowOn.makeToast(message, duration: TimeInterval(time), position: .bottom, title: "", image: image, style: style) { (finish) in
+                    viewToShowOn.makeToast(message, duration: TimeInterval(time), position: .bottom, title: nil, image: image, style: style) { (finish) in
                     }
                 }
             }
@@ -91,6 +92,10 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
         }
         
     }
+    // PRAGMA MARK: - Access view of window -
+    
+    /// returns the view of current presented screens/viewcontrolller, superview for toastview.
+    ///
     func readKeyWindow() -> UIView? {
         for window in UIApplication.shared.windows {
             if window.isKeyWindow && window.windowLevel == .normal {
@@ -99,12 +104,35 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
         }
         return nil
     }
+    // PRAGMA MARK: - Access Images -
+    
+    /// Accessing Image from framework assest - flutter_assest
+    ///
+    /// - Parameter name: name of image specified in flutter YAML file.
     public func getImage(name: String) -> UIImage? {
-        let key = FlutterDartProject.lookupKey(forAsset: name)
+        let key = FlutterDartProject.lookupKey(forAsset: name, fromPackage: "flutter_flexible_toast")
         return UIImage(named: key, in: .main, compatibleWith: nil)
     }
+    // PRAGMA MARK: - Access GIF -
+    
+    /// Accessing GIF from framework assest - flutter_assest
+    ///
+    /// - Parameter name: name of image specified in flutter YAML file.
+    public func getGIF(name: String) -> UIImage? {
+        let bundle = Bundle(identifier: FlutterDartProject.defaultBundleIdentifier())
+        let key = FlutterDartProject.lookupKey(forAsset: name, fromPackage: "flutter_flexible_toast", from: bundle!)
+        guard let baseUrl = bundle?.bundleURL.deletingLastPathComponent().deletingLastPathComponent() else {
+            return nil
+        }
+        let url = URL(fileURLWithPath:"\(baseUrl.path)/\(key)")
+         do {
+            let data = try Data(contentsOf: url)
+            return UIImage.gifImageWithData(data)
+         } catch {
+             return nil
+        }
+    }
 }
-
 extension UIColor {
     convenience init(red: Int, green: Int, blue: Int) {
         assert(red >= 0 && red <= 255, "Invalid red component")
@@ -933,8 +961,6 @@ private extension UIView {
     }
     
 }
-
-
 // FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
 // Consider refactoring the code to use the non-optional operators.
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
@@ -960,35 +986,7 @@ extension UIImage {
         
         return UIImage.animatedImageWithSource(source)
     }
-    
-    public class func gifImageWithURL(_ gifUrl:String) -> UIImage? {
-        guard let bundleURL:URL? = URL(string: gifUrl)
-            else {
-                print("image named \"\(gifUrl)\" doesn't exist")
-                return nil
-        }
-        guard let imageData = try? Data(contentsOf: bundleURL!) else {
-            print("image named \"\(gifUrl)\" into NSData")
-            return nil
-        }
-        
-        return gifImageWithData(imageData)
-    }
-    
-    public class func gifImageWithName(_ name: String) -> UIImage? {
-        guard let bundleURL = Bundle.main
-            .url(forResource: name, withExtension: "gif") else {
-                print("SwiftGif: This image named \"\(name)\" does not exist")
-                return nil
-        }
-        guard let imageData = try? Data(contentsOf: bundleURL) else {
-            print("SwiftGif: Cannot turn image named \"\(name)\" into NSData")
-            return nil
-        }
-        
-        return gifImageWithData(imageData)
-    }
-    
+
     class func delayForImageAtIndex(_ index: Int, source: CGImageSource!) -> Double {
         var delay = 0.1
         
