@@ -19,6 +19,6 @@ A Powerful Toast Library for Flutter, Easily create toast messages in single lin
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
-s.resource_bundle = {'flutter_flexible_toast' => ['flutter_flexible_toast/Assets/**/*.{png}']}
+  s.resource_bundle = {'flutter_flexible_toast' => ['flutter_flexible_toast/ios/Assets/**/*.{png}']}
   s.swift_version = '5.0'
 end

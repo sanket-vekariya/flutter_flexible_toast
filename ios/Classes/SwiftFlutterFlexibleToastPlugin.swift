@@ -1,17 +1,21 @@
 import Flutter
 import UIKit
 import ObjectiveC
+import Foundation
+import ImageIO
+import MobileCoreServices
 
 public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
-  var registrar: FlutterPluginRegistrar? = nil
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_flexible_toast", binaryMessenger: registrar.messenger())
-    let instance = SwiftFlutterFlexibleToastPlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
-    instance.registrar = registrar
-  }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    var registrar: FlutterPluginRegistrar? = nil
+    //MARK: - Register Flutter Plugin class with channel
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let channel = FlutterMethodChannel(name: "flutter_flexible_toast", binaryMessenger: registrar.messenger())
+        let instance = SwiftFlutterFlexibleToastPlugin()
+        registrar.addMethodCallDelegate(instance, channel: channel)
+        instance.registrar = registrar
+    }
+    //MARK: - Handle method channel response
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
         if "cancel" == call.method {
             self.readKeyWindow()!.hideAllToasts()
@@ -21,7 +25,6 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             self.readKeyWindow()!.hideAllToasts()
             guard let arguments = call.arguments as? [String: Any] else { return result(NSNumber(value: false)) }
             let message = arguments["message"] as? String ?? ""
-            let length = arguments["length"] as? NSNumber ?? NSNumber(value: 0)
             let durationTime = arguments["time"] as? NSNumber ?? NSNumber(value: 0)
             let gravity = arguments["gravity"] as? String ?? ""
             let icon = arguments["icon"] as? String ?? "images/ic_dnd.png"
@@ -29,8 +32,6 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             let txtColor = arguments["textcolor"] as? NSNumber ?? NSNumber(value: 0)
             let fontSize = arguments["fontSize"] as? NSNumber ?? NSNumber(value: 0)
             let radius = arguments["radius"] as? NSNumber ?? NSNumber(value: 0)
-            let elevation = arguments["elevation"] as? NSNumber ?? NSNumber(value: 0)
-            let cgf = fontSize.doubleValue
             let backgroundColor = UIColor(rgb: bgcolor.intValue)
             let textColor = UIColor(rgb: txtColor.intValue)
             var time = 1;
@@ -44,27 +45,57 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             style.backgroundColor = backgroundColor
             style.messageColor = textColor
             style.cornerRadius = CGFloat(radius.intValue)
-            if #available(iOS 11.0, *) {
-                let window = UIApplication.shared.keyWindow
-                let topPadding = window?.safeAreaInsets.top
-                let bottomPadding = window?.safeAreaInsets.bottom
+            style.imageSize = CGSize(width: 40.0, height: 40.0)
+            var imageName = "images/"
+            switch icon {
+            case "close":
+                imageName.append("ic_close.png")
+            case "error":
+                imageName.append("ic_error.png")
+            case "info":
+                imageName.append("ic_info.png")
+            case "success":
+                imageName.append("ic_success.png")
+            case "warning":
+                imageName.append("ic_warning.png")
+            case "alarm":
+                imageName.append("ic_alarm.png")
+            case "location":
+                imageName.append("ic_location.png")
+            case "wallet":
+                imageName.append("ic_wallet.png")
+            case "dnd":
+                imageName.append("ic_dnd.png")
+            case "loading":
+                imageName.append("loading.gif")
+            default: break
             }
-            if gravity == "top" {
-                let image =  self.getImageFromBundle(name: "backward")
-                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .top, title: nil, image: image, style: style) { (finish) in
-                    
-                }
-            } else if gravity == "center" {
-                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .center, title: nil, image: nil, style: style) { (finish) in
-                }
+            var image: UIImage?
+            if icon == "loading" {
+                image = getGIF(name: imageName)
             } else {
-                self.readKeyWindow()!.makeToast(message, duration: TimeInterval(time), position: .bottom, title: nil, image: nil, style: style) { (finish) in
+                image = getImage(name: imageName)
+            }
+            if let viewToShowOn = self.readKeyWindow() {
+                if gravity == "top" {
+                    viewToShowOn.makeToast(message, duration: TimeInterval(time), position: .top, title: nil, image: image, style: style) { (finish) in
+                    }
+                } else if gravity == "center" {
+                    viewToShowOn.makeToast(message, duration: TimeInterval(time), position: .center, title: nil, image: image, style: style) { (finish) in
+                    }
+                } else {
+                    viewToShowOn.makeToast(message, duration: TimeInterval(time), position: .bottom, title: nil, image: image, style: style) { (finish) in
+                    }
                 }
             }
             result(NSNumber(value: true))
         }
         
     }
+    // PRAGMA MARK: - Access view of window -
+    
+    /// returns the view of current presented screens/viewcontrolller, superview for toastview.
+    ///
     func readKeyWindow() -> UIView? {
         for window in UIApplication.shared.windows {
             if window.isKeyWindow && window.windowLevel == .normal {
@@ -73,67 +104,51 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
         }
         return nil
     }
-    // func readKeyWindow() -> UIView? {
-    //     for window in UIApplication.shared.windows {
-    //         if window.isKeyWindow && window.windowLevel == .normal {
-    //             return window.
-    //         }
-    //     }
-    //     return nil
-    // }
-
-    public func imageFromFlutter(name: String) -> UIImage? {
-        let key = registrar?.lookupKey(forAsset: name)
-        guard let topPath = Bundle.main.path(forResource: key, ofType: nil) else {return nil}
-        if let topUmage = UIImage(contentsOfFile: topPath) {
-            return topUmage
-        }
-        return nil
-    }
+    // PRAGMA MARK: - Access Images -
+    
+    /// Accessing Image from framework assest - flutter_assest
+    ///
+    /// - Parameter name: name of image specified in flutter YAML file.
     public func getImage(name: String) -> UIImage? {
-        var image: UIImage?
-        let nameFile = name.components(separatedBy: "/")
-        if let path = nameFile.first {
-            if let fileName = nameFile.last {
-                var screenScale = Int(UIScreen.main.scale)
-                while (screenScale > 1) {
-                    screenScale -= 1
-                    let key = FlutterDartProject.lookupKey(forAsset: "\(path)/\(screenScale).0x/\(fileName.last!)")
-                    image = UIImage(named: key, in: .main, compatibleWith: nil)
-                }
-            }
-        }
-        let key = FlutterDartProject.lookupKey(forAsset: name)
-        image = UIImage(named: key, in: .main, compatibleWith: nil)
-        return image
+        let key = FlutterDartProject.lookupKey(forAsset: name, fromPackage: "flutter_flexible_toast")
+        return UIImage(named: key, in: .main, compatibleWith: nil)
     }
-
-    func getImageFromBundle(name: String) -> UIImage? {
-        let podBundle = Bundle(for: self.classForCoder)
-        if let url = podBundle.url(forResource: "flutter_flexible_toast", withExtension: "bundle") {
-            let bundle = Bundle(url: url)
-            return UIImage(named: name, in: bundle, compatibleWith: nil)!
+    // PRAGMA MARK: - Access GIF -
+    
+    /// Accessing GIF from framework assest - flutter_assest
+    ///
+    /// - Parameter name: name of image specified in flutter YAML file.
+    public func getGIF(name: String) -> UIImage? {
+        let bundle = Bundle(identifier: FlutterDartProject.defaultBundleIdentifier())
+        let key = FlutterDartProject.lookupKey(forAsset: name, fromPackage: "flutter_flexible_toast", from: bundle!)
+        guard let baseUrl = bundle?.bundleURL.deletingLastPathComponent().deletingLastPathComponent() else {
+            return nil
         }
-        return nil
+        let url = URL(fileURLWithPath:"\(baseUrl.path)/\(key)")
+         do {
+            let data = try Data(contentsOf: url)
+            return UIImage.gifImageWithData(data)
+         } catch {
+             return nil
+        }
     }
 }
-
 extension UIColor {
-   convenience init(red: Int, green: Int, blue: Int) {
-       assert(red >= 0 && red <= 255, "Invalid red component")
-       assert(green >= 0 && green <= 255, "Invalid green component")
-       assert(blue >= 0 && blue <= 255, "Invalid blue component")
-
-       self.init(red: CGFloat(red) / 255.0, green: CGFloat(green) / 255.0, blue: CGFloat(blue) / 255.0, alpha: 1.0)
-   }
-
-   convenience init(rgb: Int) {
-       self.init(
-           red: (rgb >> 16) & 0xFF,
-           green: (rgb >> 8) & 0xFF,
-           blue: rgb & 0xFF
-       )
-   }
+    convenience init(red: Int, green: Int, blue: Int) {
+        assert(red >= 0 && red <= 255, "Invalid red component")
+        assert(green >= 0 && green <= 255, "Invalid green component")
+        assert(blue >= 0 && blue <= 255, "Invalid blue component")
+        
+        self.init(red: CGFloat(red) / 255.0, green: CGFloat(green) / 255.0, blue: CGFloat(blue) / 255.0, alpha: 1.0)
+    }
+    
+    convenience init(rgb: Int) {
+        self.init(
+            red: (rgb >> 16) & 0xFF,
+            green: (rgb >> 8) & 0xFF,
+            blue: rgb & 0xFF
+        )
+    }
 }
 
 
@@ -192,7 +207,7 @@ import ObjectiveC
 
 /**
  Toast is a Swift extension that adds toast notifications to the `UIView` object class.
- It is intended to be simple, lightweight, and easy to use. Most toast notifications 
+ It is intended to be simple, lightweight, and easy to use. Most toast notifications
  can be triggered with a single line of code.
  
  The `makeToast` methods create a new view and then display it as toast.
@@ -268,7 +283,7 @@ public extension UIView {
      @param image The image
      @param style The style. The shared style will be used when nil
      @param completion The completion closure, executed after the toast view disappears.
-            didTap will be `true` if the toast view was dismissed from a tap.
+     didTap will be `true` if the toast view was dismissed from a tap.
      */
     func makeToast(_ message: String?, duration: TimeInterval = ToastManager.shared.duration, position: ToastPosition = ToastManager.shared.position, title: String? = nil, image: UIImage? = nil, style: ToastStyle = ToastManager.shared.style, completion: ((_ didTap: Bool) -> Void)? = nil) {
         do {
@@ -289,7 +304,7 @@ public extension UIView {
      @param image The image
      @param style The style. The shared style will be used when nil
      @param completion The completion closure, executed after the toast view disappears.
-            didTap will be `true` if the toast view was dismissed from a tap.
+     didTap will be `true` if the toast view was dismissed from a tap.
      */
     func makeToast(_ message: String?, duration: TimeInterval = ToastManager.shared.duration, point: CGPoint, title: String?, image: UIImage?, style: ToastStyle = ToastManager.shared.style, completion: ((_ didTap: Bool) -> Void)?) {
         do {
@@ -353,7 +368,7 @@ public extension UIView {
      @warning This method has no effect on activity toasts. Use `hideToastActivity` to
      hide activity toasts.
      
-    */
+     */
     func hideToast() {
         guard let activeToast = activeToasts.firstObject as? UIView else { return }
         hideToast(activeToast)
@@ -377,14 +392,14 @@ public extension UIView {
      
      @param includeActivity If `true`, toast activity will also be hidden. Default is `false`.
      @param clearQueue If `true`, removes all toast views from the queue. Default is `true`.
-    */
+     */
     func hideAllToasts(includeActivity: Bool = false, clearQueue: Bool = true) {
         if clearQueue {
             clearToastQueue()
         }
         
         activeToasts.compactMap { $0 as? UIView }
-                    .forEach { hideToast($0) }
+            .forEach { hideToast($0) }
         
         if includeActivity {
             hideToastActivity()
@@ -404,14 +419,14 @@ public extension UIView {
     
     /**
      Creates and displays a new toast activity indicator view at a specified position.
-    
+     
      @warning Only one toast activity indicator view can be presented per superview. Subsequent
      calls to `makeToastActivity(position:)` will be ignored until `hideToastActivity()` is called.
-    
+     
      @warning `makeToastActivity(position:)` works independently of the `showToast` methods. Toast
      activity views can be presented and dismissed while toast views are being displayed.
      `makeToastActivity(position:)` has no effect on the queueing behavior of the `showToast` methods.
-    
+     
      @param position The toast's position
      */
     func makeToastActivity(_ position: ToastPosition) {
@@ -564,17 +579,17 @@ public extension UIView {
      The look and feel is configured via the style. Unlike the `makeToast` methods,
      this method does not present the toast view automatically. One of the `showToast`
      methods must be used to present the resulting view.
-    
+     
      @warning if message, title, and image are all nil, this method will throw
      `ToastError.missingParameters`
-    
+     
      @param message The message to be displayed
      @param title The title
      @param image The image
      @param style The style. The shared style will be used when nil
      @throws `ToastError.missingParameters` when message, title, and image are all nil
      @return The newly created toast view
-    */
+     */
     func toastViewForMessage(_ message: String?, title: String?, image: UIImage?, style: ToastStyle) throws -> UIView {
         // sanity
         guard message != nil || title != nil || image != nil else {
@@ -611,7 +626,7 @@ public extension UIView {
             imageRect.size.width = imageView.bounds.size.width
             imageRect.size.height = imageView.bounds.size.height
         }
-
+        
         if let title = title {
             titleLabel = UILabel()
             titleLabel?.numberOfLines = style.titleNumberOfLines
@@ -647,7 +662,7 @@ public extension UIView {
                 messageLabel?.frame = CGRect(x: 0.0, y: 0.0, width: actualWidth, height: actualHeight)
             }
         }
-  
+        
         var titleRect = CGRect.zero
         
         if let titleLabel = titleLabel {
@@ -683,10 +698,12 @@ public extension UIView {
             messageRect.size.width = longerWidth
             messageLabel.frame = messageRect
             wrapperView.addSubview(messageLabel)
+            messageLabel.frame.origin = CGPoint(x: messageLabel.frame.origin.x, y: wrapperView.center.y - (messageLabel.frame.size.height / 2.0))
         }
         
         if let imageView = imageView {
             wrapperView.addSubview(imageView)
+            imageView.center = CGPoint(x: style.horizontalPadding * 3, y: wrapperView.center.y)
         }
         
         return wrapperView
@@ -700,35 +717,35 @@ public extension UIView {
  `ToastStyle` instances define the look and feel for toast views created via the
  `makeToast` methods as well for toast views created directly with
  `toastViewForMessage(message:title:image:style:)`.
-
+ 
  @warning `ToastStyle` offers relatively simple styling options for the default
  toast view. If you require a toast view with more complex UI, it probably makes more
  sense to create your own custom UIView subclass and present it with the `showToast`
  methods.
-*/
+ */
 public struct ToastStyle {
-
+    
     public init() {}
     
     /**
      The background color. Default is `.black` at 80% opacity.
-    */
+     */
     public var backgroundColor: UIColor = UIColor.black.withAlphaComponent(0.8)
     
     /**
      The title color. Default is `UIColor.whiteColor()`.
-    */
+     */
     public var titleColor: UIColor = .white
     
     /**
      The message color. Default is `.white`.
-    */
+     */
     public var messageColor: UIColor = .white
     
     /**
      A percentage value from 0.0 to 1.0, representing the maximum width of the toast
      view relative to it's superview. Default is 0.8 (80% of the superview's width).
-    */
+     */
     public var maxWidthPercentage: CGFloat = 0.8 {
         didSet {
             maxWidthPercentage = max(min(maxWidthPercentage, 1.0), 0.0)
@@ -738,7 +755,7 @@ public struct ToastStyle {
     /**
      A percentage value from 0.0 to 1.0, representing the maximum height of the toast
      view relative to it's superview. Default is 0.8 (80% of the superview's height).
-    */
+     */
     public var maxHeightPercentage: CGFloat = 0.8 {
         didSet {
             maxHeightPercentage = max(min(maxHeightPercentage, 1.0), 0.0)
@@ -750,7 +767,7 @@ public struct ToastStyle {
      is present, this is also used as the padding between the image and the text.
      Default is 10.0.
      
-    */
+     */
     public var horizontalPadding: CGFloat = 10.0
     
     /**
@@ -758,47 +775,47 @@ public struct ToastStyle {
      is present, this is also used as the padding between the title and the message.
      Default is 10.0. On iOS11+, this value is added added to the `safeAreaInset.top`
      and `safeAreaInsets.bottom`.
-    */
+     */
     public var verticalPadding: CGFloat = 10.0
     
     /**
      The corner radius. Default is 10.0.
-    */
+     */
     public var cornerRadius: CGFloat = 10.0;
     
     /**
      The title font. Default is `.boldSystemFont(16.0)`.
-    */
+     */
     public var titleFont: UIFont = .boldSystemFont(ofSize: 16.0)
     
     /**
      The message font. Default is `.systemFont(ofSize: 16.0)`.
-    */
+     */
     public var messageFont: UIFont = .systemFont(ofSize: 16.0)
     
     /**
      The title text alignment. Default is `NSTextAlignment.Left`.
-    */
+     */
     public var titleAlignment: NSTextAlignment = .left
     
     /**
      The message text alignment. Default is `NSTextAlignment.Left`.
-    */
+     */
     public var messageAlignment: NSTextAlignment = .left
     
     /**
      The maximum number of lines for the title. The default is 0 (no limit).
-    */
+     */
     public var titleNumberOfLines = 0
     
     /**
      The maximum number of lines for the message. The default is 0 (no limit).
-    */
+     */
     public var messageNumberOfLines = 0
     
     /**
      Enable or disable a shadow on the toast view. Default is `false`.
-    */
+     */
     public var displayShadow = false
     
     /**
@@ -809,32 +826,32 @@ public struct ToastStyle {
     /**
      A value from 0.0 to 1.0, representing the opacity of the shadow.
      Default is 0.8 (80% opacity).
-    */
+     */
     public var shadowOpacity: Float = 0.8 {
         didSet {
             shadowOpacity = max(min(shadowOpacity, 1.0), 0.0)
         }
     }
-
+    
     /**
      The shadow radius. Default is 6.0.
-    */
+     */
     public var shadowRadius: CGFloat = 6.0
     
     /**
      The shadow offset. The default is 4 x 4.
-    */
+     */
     public var shadowOffset = CGSize(width: 4.0, height: 4.0)
     
     /**
      The image size. The default is 80 x 80.
-    */
+     */
     public var imageSize = CGSize(width: 80.0, height: 80.0)
     
     /**
      The size of the toast activity view when `makeToastActivity(position:)` is called.
      Default is 100 x 100.
-    */
+     */
     public var activitySize = CGSize(width: 100.0, height: 100.0)
     
     /**
@@ -859,7 +876,7 @@ public struct ToastStyle {
 /**
  `ToastManager` provides general configuration options for all toast
  notifications. Backed by a singleton instance.
-*/
+ */
 public class ToastManager {
     
     /**
@@ -943,4 +960,148 @@ private extension UIView {
         }
     }
     
+}
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l < r
+    case (nil, _?):
+        return true
+    default:
+        return false
+    }
+}
+
+
+
+extension UIImage {
+    
+    public class func gifImageWithData(_ data: Data) -> UIImage? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+            print("image doesn't exist")
+            return nil
+        }
+        
+        return UIImage.animatedImageWithSource(source)
+    }
+
+    class func delayForImageAtIndex(_ index: Int, source: CGImageSource!) -> Double {
+        var delay = 0.1
+        
+        let cfProperties = CGImageSourceCopyPropertiesAtIndex(source, index, nil)
+        let gifProperties: CFDictionary = unsafeBitCast(
+            CFDictionaryGetValue(cfProperties,
+                                 Unmanaged.passUnretained(kCGImagePropertyGIFDictionary).toOpaque()),
+            to: CFDictionary.self)
+        
+        var delayObject: AnyObject = unsafeBitCast(
+            CFDictionaryGetValue(gifProperties,
+                                 Unmanaged.passUnretained(kCGImagePropertyGIFUnclampedDelayTime).toOpaque()),
+            to: AnyObject.self)
+        if delayObject.doubleValue == 0 {
+            delayObject = unsafeBitCast(CFDictionaryGetValue(gifProperties,
+                                                             Unmanaged.passUnretained(kCGImagePropertyGIFDelayTime).toOpaque()), to: AnyObject.self)
+        }
+        
+        delay = delayObject as! Double
+        
+        if delay < 0.1 {
+            delay = 0.1
+        }
+        
+        return delay
+    }
+    
+    class func gcdForPair(_ a: Int?, _ b: Int?) -> Int {
+        var a = a
+        var b = b
+        if b == nil || a == nil {
+            if b != nil {
+                return b!
+            } else if a != nil {
+                return a!
+            } else {
+                return 0
+            }
+        }
+        
+        if a < b {
+            let c = a
+            a = b
+            b = c
+        }
+        
+        var rest: Int
+        while true {
+            rest = a! % b!
+            
+            if rest == 0 {
+                return b!
+            } else {
+                a = b
+                b = rest
+            }
+        }
+    }
+    
+    class func gcdForArray(_ array: Array<Int>) -> Int {
+        if array.isEmpty {
+            return 1
+        }
+        
+        var gcd = array[0]
+        
+        for val in array {
+            gcd = UIImage.gcdForPair(val, gcd)
+        }
+        
+        return gcd
+    }
+    
+    class func animatedImageWithSource(_ source: CGImageSource) -> UIImage? {
+        let count = CGImageSourceGetCount(source)
+        var images = [CGImage]()
+        var delays = [Int]()
+        
+        for i in 0..<count {
+            if let image = CGImageSourceCreateImageAtIndex(source, i, nil) {
+                images.append(image)
+            }
+            
+            let delaySeconds = UIImage.delayForImageAtIndex(Int(i),
+                                                            source: source)
+            delays.append(Int(delaySeconds * 1000.0)) // Seconds to ms
+        }
+        
+        let duration: Int = {
+            var sum = 0
+            
+            for val: Int in delays {
+                sum += val
+            }
+            
+            return sum
+        }()
+        
+        let gcd = gcdForArray(delays)
+        var frames = [UIImage]()
+        
+        var frame: UIImage
+        var frameCount: Int
+        for i in 0..<count {
+            frame = UIImage(cgImage: images[Int(i)])
+            frameCount = Int(delays[Int(i)] / gcd)
+            
+            for _ in 0..<frameCount {
+                frames.append(frame)
+            }
+        }
+        
+        let animation = UIImage.animatedImage(with: frames,
+                                              duration: Double(duration) / 1000.0)
+        
+        return animation
+    }
 }
