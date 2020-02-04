@@ -1,7 +1,7 @@
 # flutter_flexible_toast Example
 
 ```
-flutter_flexible_toast: ^0.1.2
+flutter_flexible_toast: ^0.1.3
 ```
 ```
 import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';

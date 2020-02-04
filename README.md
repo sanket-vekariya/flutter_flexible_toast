@@ -5,7 +5,7 @@ Toast Library for Flutter.
 ### How to Use
 just add below in pubspec.yaml 
 ```
-flutter_flexible_toast: ^0.1.2
+flutter_flexible_toast: ^0.1.3
 ```
 ```
 import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
@@ -20,7 +20,8 @@ FlutterFlexibleToast.showToast(
     elevation: 10,
     textColor: Colors.white,
     backgroundColor: Colors.black,
-    timeInSeconds: 2);
+    timeInSeconds: 2
+);
 ```
 
 ### To cancel all the toasts call
@@ -34,4 +35,6 @@ FlutterFlexibleToast.cancel();
 ![short_loading_gif_toast](https://user-images.githubusercontent.com/52414184/68575338-d8a9d800-0491-11ea-904d-9324b76ac617.gif)
 
 ### For More Info 
-Email on ssvekariya11@gmail.com
+Email : android : ssvekariya11@gmail.com <br>
+Email : ios : on iospareshse@gmail.com
+

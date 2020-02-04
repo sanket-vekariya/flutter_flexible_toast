@@ -1,3 +1,8 @@
+## 0.1.3
+
+* new : Added IOS Support.
+* fix : Bug fixes, Improved stability.
+
 ## 0.1.2
 
 * Added New Loading Gif Support.

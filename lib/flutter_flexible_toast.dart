@@ -17,7 +17,6 @@ enum ICON {
   WARNING,
   ALARM,
   LOCATION,
-  WALLET,
   DND,
   LOADING
 }
@@ -71,8 +70,6 @@ class FlutterFlexibleToast {
       images = "alarm";
     } else if (icon == ICON.LOCATION) {
       images = "location";
-    } else if (icon == ICON.WALLET) {
-      images = "wallet";
     } else if (icon == ICON.DND) {
       images = "dnd";
     } else if (icon == ICON.LOADING) {

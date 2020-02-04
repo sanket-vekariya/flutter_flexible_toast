@@ -138,11 +138,6 @@ class FlutterFlexibleToastPlugin : MethodCallHandler {
                         gifImageView.visibility = View.GONE
                         image.setImageResource(R.drawable.ic_location)
                     }
-                    "wallet" -> {
-                        image.visibility = View.VISIBLE
-                        gifImageView.visibility = View.GONE
-                        image.setImageResource(R.drawable.ic_wallet)
-                    }
                     "dnd" -> {
                         image.visibility = View.VISIBLE
                         gifImageView.visibility = View.GONE

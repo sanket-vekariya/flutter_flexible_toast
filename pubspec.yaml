@@ -1,7 +1,9 @@
 name: flutter_flexible_toast
 description: A Powerful Toast Library for Flutter, Easily create toast messages in single line of code with leading image options.
 version: 0.1.3
-author: Sanket Vekariya <ssvekariya11@gmail.com>
+author:
+  - Sanket Vekariya <ssvekariya11@gmail.com>
+  - Paresh Prajapati <iospareshse@gmail.com>
 homepage: https://github.com/sanket-vekariya/flutter_flexible_toast
 
 environment:
