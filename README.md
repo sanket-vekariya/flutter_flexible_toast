@@ -5,7 +5,7 @@ Toast Library for Flutter.
 ### How to Use
 just add below in pubspec.yaml 
 ```
-flutter_flexible_toast: ^0.1.3
+flutter_flexible_toast: ^0.1.4
 ```
 ```
 import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
@@ -18,6 +18,7 @@ FlutterFlexibleToast.showToast(
     icon: ICON.LOADING,
     radius: 100,
     elevation: 10,
+    imageSize: 35,
     textColor: Colors.white,
     backgroundColor: Colors.black,
     timeInSeconds: 2

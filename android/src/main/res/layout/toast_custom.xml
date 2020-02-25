@@ -34,8 +34,8 @@
 
         <sanketvekariya.flutter_flexible_toast.GifImageView
             android:id="@+id/gifImageView"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
@@ -47,8 +47,8 @@
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"

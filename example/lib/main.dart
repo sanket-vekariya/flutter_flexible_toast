@@ -29,6 +29,7 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.red,
         icon: ICON.SUCCESS,
         fontSize: 16,
+        imageSize: 35,
         textColor: Colors.white);
   }
 

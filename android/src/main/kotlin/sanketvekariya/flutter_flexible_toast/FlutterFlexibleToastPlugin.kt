@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
@@ -68,6 +69,7 @@ class FlutterFlexibleToastPlugin : MethodCallHandler {
                 }
                 val bgcolor = call.argument<Number>("bgcolor")
                 val textcolor = call.argument<Number>("textcolor")
+                val imageSize = call.argument<Number>("imageSize")
                 val textSize = call.argument<Number>("fontSize")
                 val radius = call.argument<Int>("radius")!!
                 val elevation = call.argument<Int>("elevation")!!
@@ -161,6 +163,13 @@ class FlutterFlexibleToastPlugin : MethodCallHandler {
                 cardView.cardElevation = elevation.toFloat()
                 if (textSize != null) {
                     text.textSize = textSize.toFloat()
+                }
+                if (imageSize != null) {
+                    val layoutParams = image.layoutParams
+                    layoutParams.height = (imageSize as Int) * 3
+                    layoutParams.width = imageSize * 3
+                    image.layoutParams = layoutParams
+                    gifImageView.layoutParams = layoutParams
                 }
                 if (textcolor != null) {
                     text.setTextColor(textcolor.toInt())

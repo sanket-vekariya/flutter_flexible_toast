@@ -1,3 +1,8 @@
+## 0.1.4
+
+* new : New parameter "imageSize" added for leading image.
+* fix : Plugin size optimized, Improved stability.
+
 ## 0.1.3
 
 * new : Added IOS Support.

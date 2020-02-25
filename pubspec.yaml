@@ -1,6 +1,6 @@
 name: flutter_flexible_toast
 description: A Powerful Toast Library for Flutter, Easily create toast messages in single line of code with leading image options.
-version: 0.1.3
+version: 0.1.4
 authors:
   - Sanket Vekariya <ssvekariya11@gmail.com>
   - Paresh Prajapati <iospareshse@gmail.com>
@@ -31,10 +31,8 @@ flutter:
     pluginClass: FlutterFlexibleToastPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
-  assets:
-    - images/
-    
-    # - images/a_dot_ham.jpeg
+  #  assets:
+  #    - images/
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages

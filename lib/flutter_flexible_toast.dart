@@ -41,6 +41,7 @@ class FlutterFlexibleToast {
     ICON icon,
     int radius,
     int elevation,
+    int imageSize,
   }) async {
     String toast = "short";
     if (toastLength == Toast.LENGTH_LONG) {
@@ -85,6 +86,10 @@ class FlutterFlexibleToast {
       textColor = Colors.white;
     }
 
+    if (imageSize == null) {
+      imageSize = 25;
+    }
+
     /**
      * mapped input here with method channel for native changes.
      */
@@ -94,11 +99,12 @@ class FlutterFlexibleToast {
       'time': timeInSeconds != null ? timeInSeconds : 1,
       'gravity': gravityToast,
       'icon': images,
-      'bgcolor': backgroundColor != null ? backgroundColor.value : null,
-      'textcolor': textColor != null ? textColor.value : null,
+      'bgcolor': backgroundColor != null ? backgroundColor.value : Colors.black,
+      'textcolor': textColor != null ? textColor.value : Colors.white,
       'fontSize': fontSize != null ? fontSize : 16.0,
       'radius': radius != null ? radius : 5,
       'elevation': elevation != null ? elevation : 5,
+      'imageSize': imageSize != null ? imageSize : 25,
     };
 
     bool res = await _channel.invokeMethod('showToast', parameters);
