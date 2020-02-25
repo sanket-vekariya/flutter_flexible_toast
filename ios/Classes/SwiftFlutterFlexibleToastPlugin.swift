@@ -34,6 +34,7 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             let radius = arguments["radius"] as? NSNumber ?? NSNumber(value: 0)
             let backgroundColor = UIColor(rgb: bgcolor.intValue)
             let textColor = UIColor(rgb: txtColor.intValue)
+            let imageSize = arguments["imageSize"] as? NSNumber ?? NSNumber(value: 25)
             var time = 1;
             time = (durationTime.intValue == 0) ? 3 : durationTime.intValue
             if time > 10 {
@@ -45,7 +46,7 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             style.backgroundColor = backgroundColor
             style.messageColor = textColor
             style.cornerRadius = CGFloat(radius.intValue)
-            style.imageSize = CGSize(width: 25.0, height: 25.0)
+            style.imageSize = CGSize(width: imageSize.intValue, height: imageSize.intValue)
             var imageName = "images/"
             switch icon {
             case "close":
@@ -67,7 +68,7 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             case "dnd":
                 imageName.append("ic_dnd.png")
             case "loading":
-                imageName.append("loading.gif")
+                imageName.append("loading_resize.gif")
             default: break
             }
             var image: UIImage?
