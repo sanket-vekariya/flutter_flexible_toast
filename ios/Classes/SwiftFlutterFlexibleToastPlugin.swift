@@ -45,7 +45,7 @@ public class SwiftFlutterFlexibleToastPlugin: NSObject, FlutterPlugin {
             style.backgroundColor = backgroundColor
             style.messageColor = textColor
             style.cornerRadius = CGFloat(radius.intValue)
-            style.imageSize = CGSize(width: 40.0, height: 40.0)
+            style.imageSize = CGSize(width: 25.0, height: 25.0)
             var imageName = "images/"
             switch icon {
             case "close":
@@ -675,7 +675,7 @@ public extension UIView {
         var messageRect = CGRect.zero
         
         if let messageLabel = messageLabel {
-            messageRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding
+            messageRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding + 4
             messageRect.origin.y = titleRect.origin.y + titleRect.size.height + style.verticalPadding
             messageRect.size.width = messageLabel.bounds.size.width
             messageRect.size.height = messageLabel.bounds.size.height
@@ -768,7 +768,7 @@ public struct ToastStyle {
      Default is 10.0.
      
      */
-    public var horizontalPadding: CGFloat = 10.0
+    public var horizontalPadding: CGFloat = 8.0
     
     /**
      The spacing from the vertical edge of the toast view to the content. When a title
