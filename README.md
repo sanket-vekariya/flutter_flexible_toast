@@ -31,9 +31,7 @@ FlutterFlexibleToast.cancel();
 ```
 
 ### Preview Screenshots 
-![short_info_one_second_toast](https://user-images.githubusercontent.com/52414184/66133939-24589e80-e615-11e9-8cbb-20f79f917a1d.png)
-![short_red_success_toast](https://user-images.githubusercontent.com/52414184/66134012-3f2b1300-e615-11e9-89dd-93b19d6de9c0.png)
-![short_loading_gif_toast](https://user-images.githubusercontent.com/52414184/68575338-d8a9d800-0491-11ea-904d-9324b76ac617.gif)
+![short_info_one_second_toast](https://user-images.githubusercontent.com/52414184/82424169-69491c80-9aa2-11ea-8fb2-b60d6daa2b03.jpg)
 
 ### For More Info 
 Email : android : ssvekariya11@gmail.com <br>
